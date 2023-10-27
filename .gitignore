@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE files
+.vscode/
+settings.json
+
+# Mac windowing file
+.DS_Store
