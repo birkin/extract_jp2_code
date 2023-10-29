@@ -1,4 +1,4 @@
-import json, logging, pprint, sys
+import json, logging, pathlib, pprint, sys
 from pdf2image import convert_from_path
 
 ## set up debug-level logger using basicConfig ----------------------
@@ -10,15 +10,17 @@ logging.basicConfig(
 log = logging.getLogger( __name__ )
 
 
-def run_code():
+def run_code( pdf_path: str ) -> None:
     """ Main function. Called by __main__.py """
     ## load tracker-dict from json ----------------------------------
-    tracker_dict: dict = load_tracker()
+    # tracker_dict: dict = load_tracker()
     ## get list of URLs to process ----------------------------------
-    urls_to_process: list = tracker_dict['urls_to_process']
+    # urls_to_process: list = tracker_dict['urls_to_process']
 
     ## extract image from PDF ---------------------------------------
-    image_path = extract_image( '../downloaded_pdfs/test.pdf' )
+    pdf_filename = pathlib.Path( pdf_path ).name
+    log.debug( f'pdf_filename, ``{pdf_filename}``' )   
+    # image_path = extract_image( '../downloaded_pdfs/test.pdf' )
 
     # process each URL ----------------------------------------------
     # for url in urls_to_process:
@@ -89,4 +91,6 @@ def load_tracker():
     return tracker_dict  
 
 if __name__ == '__main__':
-    run_code()
+    ## get path from arg
+    pdf_path: str = sys.argv[1]
+    run_code( pdf_path )
