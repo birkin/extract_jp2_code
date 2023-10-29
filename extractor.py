@@ -1,15 +1,23 @@
-import json, logging, pathlib, pprint, sys
-from pdf2image import convert_from_path
+import json, logging, os, pathlib, pprint, sys
+# from pdf2image import convert_from_path
 
-## set up debug-level logger using basicConfig ----------------------
+## settings ---------------------------------------------------------
+LOG_FILE_PATH = os.environ['JP2_MAKER_LOG_FILE_PATH']
+
+## set up logger ----------------------------------------------------
+FORMAT_STRING = '[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s'
 logging.basicConfig(
+    filename=LOG_FILE_PATH,
     level=logging.DEBUG,
-    format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
+    format=FORMAT_STRING,
     datefmt='%d/%b/%Y %H:%M:%S',
-    handlers=[ logging.StreamHandler(sys.stdout) ] )
+    )
 log = logging.getLogger( __name__ )
+console_handler = logging.StreamHandler()  # log to terminal also
+console_handler.setFormatter( logging.Formatter(FORMAT_STRING) )
+log.addHandler(console_handler)
 
-
+## dundermain manager function --------------------------------------
 def run_code( pdf_path: str ) -> None:
     """ Main function. Called by __main__.py """
     ## load tracker-dict from json ----------------------------------
@@ -17,9 +25,15 @@ def run_code( pdf_path: str ) -> None:
     ## get list of URLs to process ----------------------------------
     # urls_to_process: list = tracker_dict['urls_to_process']
 
-    ## extract image from PDF ---------------------------------------
+    ## get filename from path ---------------------------------------
     pdf_filename = pathlib.Path( pdf_path ).name
-    log.debug( f'pdf_filename, ``{pdf_filename}``' )   
+    log.debug( f'pdf_filename, ``{pdf_filename}``' )
+
+    ## get root filename without extension --------------------------
+    pdf_root_filename = os.path.splitext( pdf_filename )[0]
+    log.debug( f'pdf_root_filename, ``{pdf_root_filename}``' )
+
+    ## extract image from PDF ---------------------------------------
     # image_path = extract_image( '../downloaded_pdfs/test.pdf' )
 
     # process each URL ----------------------------------------------
@@ -45,26 +59,26 @@ def run_code( pdf_path: str ) -> None:
     return
 
 
-def extract_image( pdf_path: str ) -> str:
-    """ Load PDF, extract image, save image, return image path. """
-    log.debug( f'pdf_path, ```{pdf_path}```' )
-    # Convert PDF to image
-    images = pdf2image.convert_from_path(pdf_path)
+# def extract_image( pdf_path: str ) -> str:
+#     """ Load PDF, extract image, save image, return image path. """
+#     log.debug( f'pdf_path, ```{pdf_path}```' )
+#     # Convert PDF to image
+#     images = pdf2image.convert_from_path(pdf_path)
 
-    # Determine image type and extension
-    image_type = images[0].format.lower()
-    if image_type == 'jpeg':
-        extension = 'jpg'
-    elif image_type == 'png':
-        extension = 'png'
-    else:
-        raise ValueError(f'Unsupported image type: {image_type}')
+#     # Determine image type and extension
+#     image_type = images[0].format.lower()
+#     if image_type == 'jpeg':
+#         extension = 'jpg'
+#     elif image_type == 'png':
+#         extension = 'png'
+#     else:
+#         raise ValueError(f'Unsupported image type: {image_type}')
 
-    # Save image to file with appropriate extension
-    image_path = os.path.splitext(pdf_path)[0] + '.' + extension
-    images[0].save(image_path, image_type.upper())
+#     # Save image to file with appropriate extension
+#     image_path = os.path.splitext(pdf_path)[0] + '.' + extension
+#     images[0].save(image_path, image_type.upper())
 
-    return image_path
+#     return image_path
 
 
 
